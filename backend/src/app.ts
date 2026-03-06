@@ -1,1 +1,0 @@
-console.log("MitiFlow backend is starting...");
