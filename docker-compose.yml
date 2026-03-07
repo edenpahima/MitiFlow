@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: mitiflow-postgres
+    environment:
+      POSTGRES_USER: mitiflow
+      POSTGRES_PASSWORD: mitiflow123
+      POSTGRES_DB: mitiflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: mitiflow-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
