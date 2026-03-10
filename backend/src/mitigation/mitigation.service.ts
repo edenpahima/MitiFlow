@@ -208,4 +208,21 @@ export class MitigationService {
         return undefined;
     }
   }
+
+  async hasActiveRule(victimIp: string): Promise<boolean> {
+    const rule = await this.ruleRepo.findOne({
+      where: { victimIp, status: 'active' },
+    });
+    return !!rule;
+  }
+
+  async withdrawAllActiveRules() {
+    const activeRules = await this.ruleRepo.find({
+      where: { status: 'active' },
+    });
+
+    for (const rule of activeRules) {
+      await this.withdrawRule(rule.id);
+    }
+  }
 }

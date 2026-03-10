@@ -87,8 +87,9 @@ export class SimulatorService {
     this.logger.log(`ICMP flood started → ${victimIp} [${intensity}]`);
   }
 
-  stopAttack() {
+  async stopAttack() {
     this.attackState = null;
+    await this.mitigationService.withdrawAllActiveRules();
     this.logger.log('Attack simulation stopped');
   }
 
@@ -109,11 +110,21 @@ export class SimulatorService {
       flows.push(this.generateNormalFlow());
     }
 
-    // If attack is active, inject attack flows on top
+    // If attack is active, check if it's being mitigated
     if (this.attackState) {
-      const count = INTENSITY_MULTIPLIER[this.attackState.intensity];
-      for (let i = 0; i < count; i++) {
-        flows.push(this.generateAttackFlow(this.attackState));
+      const isMitigated = await this.mitigationService.hasActiveRule(
+        this.attackState.victimIp,
+      );
+
+      if (!isMitigated) {
+        const count = INTENSITY_MULTIPLIER[this.attackState.intensity];
+        for (let i = 0; i < count; i++) {
+          flows.push(this.generateAttackFlow(this.attackState));
+        }
+      } else {
+        this.logger.log(
+          `Attack traffic blocked by mitigation rule for ${this.attackState.victimIp}`,
+        );
       }
     }
 

@@ -4,14 +4,16 @@ import { AttackList } from './components/AttackList';
 import { MitigationRules } from './components/MitigationRules';
 import { SimulatePanel } from './components/SimulatePanel';
 import { BgpLog } from './components/BgpLog';
-import type { AttackEvent, MitigationRule, BgpLogEntry, Stats } from './types';
+import type { AttackEvent, MitigationRule, BgpLogEntry, Stats, ChartPoint } from './types';
+import { TrafficChart } from './components/TrafficChart';
 
 export default function App() {
   const { data: stats, refetch: refetchStats } = usePolling<Stats>('/api/attacks/stats');
   const { data: attacks, refetch: refetchAttacks } = usePolling<AttackEvent[]>('/api/attacks?status=active');
   const { data: rules, refetch: refetchRules } = usePolling<MitigationRule[]>('/api/mitigate?status=active');
   const { data: bgpLog } = usePolling<BgpLogEntry[]>('/api/mitigate/bgp-log');
-
+  const { data: chartData } = usePolling<ChartPoint[]>('/api/flows/chart', 3000);
+  
   const refetchAll = () => {
     void refetchStats();
     void refetchAttacks();
@@ -27,6 +29,7 @@ export default function App() {
         </div>
 
         <StatCards stats={stats} />
+        <TrafficChart data={chartData} />
         <SimulatePanel />
         <AttackList attacks={attacks} />
         <MitigationRules rules={rules} onWithdraw={refetchAll} />

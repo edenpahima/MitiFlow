@@ -6,6 +6,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { v4 as uuidv4 } from 'uuid';
 import { FlowRecord } from '../db/entities/flow-record.entity';
 import { AttackEvent } from '../db/entities/attack-event.entity';
+import { MitigationRule } from 'src/db/entities/mitigation-rule.entity';
 
 // ─── Thresholds ───────────────────────────────────────────────────────────────
 const THRESHOLD_PPS = 300; // packets/sec toward one IP
@@ -34,6 +35,8 @@ export class DetectionService {
     private flowRepo: Repository<FlowRecord>,
     @InjectRepository(AttackEvent)
     private attackRepo: Repository<AttackEvent>,
+    @InjectRepository(MitigationRule)
+    private mitigationRepo: Repository<MitigationRule>,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -194,7 +197,6 @@ export class DetectionService {
   //     }
   //   }
   private async checkResolved(currentStats: TrafficStats[]) {
-    // Only consider attacks that have been active for at least 15 seconds
     const activeAttacks = await this.attackRepo
       .createQueryBuilder('a')
       .where('a.status = :status', { status: 'active' })
@@ -202,6 +204,12 @@ export class DetectionService {
       .getMany();
 
     for (const attack of activeAttacks) {
+      // Don't resolve if there's still an active mitigation rule
+      const activeMitigationRule = await this.mitigationRepo.findOne({
+        where: { victimIp: attack.victimIp, status: 'active' },
+      });
+      if (activeMitigationRule) continue;
+
       const currentStat = currentStats.find((s) => s.dstIp === attack.victimIp);
       const isStillUnderAttack =
         currentStat &&

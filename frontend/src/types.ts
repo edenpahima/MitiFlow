@@ -41,3 +41,10 @@ export interface Stats {
   totalAttacksToday: number;
   mitigatedToday: number;
 }
+
+export interface ChartPoint {
+  time: string;
+  pps: number;
+  bps: number;
+  attackPps: number;
+}

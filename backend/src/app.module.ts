@@ -2,13 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DbModule } from './db/db.module';
 import { SimulatorModule } from './simulator/simulator.module';
+import { DetectionModule } from './detection/detection.module';
+import { MitigationModule } from './mitigation/mitigation.module';
 import { SimulateController } from './api/simulate.controller';
 import { AttacksController } from './api/attacks.controller';
-import { DetectionModule } from './detection/detection.module';
 import { MitigationController } from './api/mitigation.controller';
-import { MitigationModule } from './mitigation/mitigation.module';
+import { FlowsController } from './api/flows.controller';
+import { FlowRecord } from './db/entities/flow-record.entity';
 
 @Module({
   imports: [
@@ -19,7 +22,13 @@ import { MitigationModule } from './mitigation/mitigation.module';
     SimulatorModule,
     DetectionModule,
     MitigationModule,
+    TypeOrmModule.forFeature([FlowRecord]),
   ],
-  controllers: [SimulateController, AttacksController, MitigationController],
+  controllers: [
+    SimulateController,
+    AttacksController,
+    MitigationController,
+    FlowsController,
+  ],
 })
 export class AppModule {}
