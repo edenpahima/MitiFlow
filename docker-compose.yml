@@ -12,6 +12,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mitiflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer
@@ -20,6 +25,34 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mitiflow-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: mitiflow
+      DB_PASSWORD: mitiflow123
+      DB_NAME: mitiflow
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mitiflow-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

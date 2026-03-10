@@ -11,5 +11,14 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  preview: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://backend:3000',
+        changeOrigin: true,
+      }
+    }
   }
 })
