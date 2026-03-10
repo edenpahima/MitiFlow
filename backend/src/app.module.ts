@@ -7,6 +7,8 @@ import { SimulatorModule } from './simulator/simulator.module';
 import { SimulateController } from './api/simulate.controller';
 import { AttacksController } from './api/attacks.controller';
 import { DetectionModule } from './detection/detection.module';
+import { MitigationController } from './api/mitigation.controller';
+import { MitigationModule } from './mitigation/mitigation.module';
 
 @Module({
   imports: [
@@ -16,7 +18,8 @@ import { DetectionModule } from './detection/detection.module';
     DbModule,
     SimulatorModule,
     DetectionModule,
+    MitigationModule,
   ],
-  controllers: [SimulateController, AttacksController],
+  controllers: [SimulateController, AttacksController, MitigationController],
 })
 export class AppModule {}

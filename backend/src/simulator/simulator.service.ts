@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Interval } from '@nestjs/schedule';
 import { v4 as uuidv4 } from 'uuid';
 import { FlowRecord } from '../db/entities/flow-record.entity';
+import { MitigationService } from 'src/mitigation/mitigation.service';
 
 type Protocol = 'tcp' | 'udp' | 'icmp';
 type Intensity = 'low' | 'medium' | 'high';
@@ -31,7 +32,14 @@ export class SimulatorService {
   constructor(
     @InjectRepository(FlowRecord)
     private flowRepo: Repository<FlowRecord>,
+    private mitigationService: MitigationService,
   ) {}
+
+  // Add this interval
+  @Interval(60000)
+  async expireRules() {
+    await this.mitigationService.expireRules();
+  }
 
   @Interval(60000)
   async cleanup() {

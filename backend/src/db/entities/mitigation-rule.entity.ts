@@ -5,8 +5,8 @@ export class MitigationRule {
   @PrimaryColumn()
   id: string;
 
-  @Column({ nullable: true })
-  attackId: string;
+  @Column({ type: 'varchar', nullable: true })
+  attackId: string | null;
 
   @Column()
   victimIp: string;
@@ -17,8 +17,8 @@ export class MitigationRule {
   @Column({ default: 'any' })
   protocol: string;
 
-  @Column({ nullable: true })
-  port: number;
+  @Column({ type: 'int', nullable: true })
+  port: number | null;
 
   @Column({ default: 'drop' })
   action: string; // 'drop' | 'rate-limit' | 'redirect-scrubbing'
