@@ -116,10 +116,18 @@ export class DetectionService {
 
   // ─── Severity Calculator ──────────────────────────────────────────────────
 
+  //   private calculateSeverity(pps: number, bps: number): AttackEvent['severity'] {
+  //     if (pps > THRESHOLD_PPS * 10 || bps > THRESHOLD_BPS * 10) return 'critical';
+  //     if (pps > THRESHOLD_PPS * 5 || bps > THRESHOLD_BPS * 5) return 'high';
+  //     if (pps > THRESHOLD_PPS * 2 || bps > THRESHOLD_BPS * 2) return 'medium';
+  //     return 'low';
+  //   }
+
   private calculateSeverity(pps: number, bps: number): AttackEvent['severity'] {
-    if (pps > THRESHOLD_PPS * 10 || bps > THRESHOLD_BPS * 10) return 'critical';
-    if (pps > THRESHOLD_PPS * 5 || bps > THRESHOLD_BPS * 5) return 'high';
-    if (pps > THRESHOLD_PPS * 2 || bps > THRESHOLD_BPS * 2) return 'medium';
+    // SYN floods are high PPS but low BPS — check PPS first
+    if (pps > 1000 || bps > THRESHOLD_BPS * 10) return 'critical';
+    if (pps > 500 || bps > THRESHOLD_BPS * 5) return 'high';
+    if (pps > 300 || bps > THRESHOLD_BPS * 2) return 'medium';
     return 'low';
   }
 
