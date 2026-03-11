@@ -12,6 +12,8 @@ import { AttacksController } from './api/attacks.controller';
 import { MitigationController } from './api/mitigation.controller';
 import { FlowsController } from './api/flows.controller';
 import { FlowRecord } from './db/entities/flow-record.entity';
+import { AttackEvent } from './db/entities/attack-event.entity';
+import { MitigationRule } from './db/entities/mitigation-rule.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { FlowRecord } from './db/entities/flow-record.entity';
     SimulatorModule,
     DetectionModule,
     MitigationModule,
-    TypeOrmModule.forFeature([FlowRecord]),
+    TypeOrmModule.forFeature([FlowRecord, AttackEvent, MitigationRule]),
   ],
   controllers: [
     SimulateController,

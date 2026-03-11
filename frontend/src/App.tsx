@@ -6,6 +6,7 @@ import { SimulatePanel } from './components/SimulatePanel';
 import { BgpLog } from './components/BgpLog';
 import type { AttackEvent, MitigationRule, BgpLogEntry, Stats, ChartPoint } from './types';
 import { TrafficChart } from './components/TrafficChart';
+import axios from 'axios';
 
 export default function App() {
   const { data: stats, refetch: refetchStats } = usePolling<Stats>('/api/attacks/stats');
@@ -13,7 +14,10 @@ export default function App() {
   const { data: rules, refetch: refetchRules } = usePolling<MitigationRule[]>('/api/mitigate?status=active');
   const { data: bgpLog } = usePolling<BgpLogEntry[]>('/api/mitigate/bgp-log');
   const { data: chartData } = usePolling<ChartPoint[]>('/api/flows/chart', 3000);
-  
+  const handleReset = async () => {
+  await axios.delete('/api/flows/reset');
+  window.location.reload();
+};
   const refetchAll = () => {
     void refetchStats();
     void refetchAttacks();
@@ -27,6 +31,22 @@ export default function App() {
           <h1 style={{ color: '#fff', fontSize: 24, margin: 0 }}>🛡️ MitiFlow</h1>
           <p style={{ color: '#555', margin: '4px 0 0' }}>DDoS Detection & Mitigation Control Plane</p>
         </div>
+  <button
+    onClick={() => void handleReset()}
+    style={{
+      background: '#ef444422',
+      color: '#ef4444',
+      border: '1px solid #ef4444',
+      borderRadius: 6,
+      padding: '8px 16px',
+      cursor: 'pointer',
+      fontSize: 13,
+      fontWeight: 600,
+    }}
+  >
+    🗑️ Reset DB
+  </button>
+
 
         <StatCards stats={stats} />
         <TrafficChart data={chartData} />
